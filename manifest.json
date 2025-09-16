@@ -1,40 +1,185 @@
 {
-  "name": "Tapframe's Repo",
+  "name": "Michaz's Repo",
   "version": "1.0.0",
   "scrapers": [
     {
       
     
-      "id": "4khdhub",
-      "name": "4KHDHub",
-      "description": "4KHDHub direct links",
-      "version": "1.0.1",
-      "author": "Nuvio Team",
+      "id": "flimpalast",
+      "name": "Filmpalast",
+      "description": "Most Movies & Top Series",
+      "version": "1.0.0",
+      "author": "Michaz",
       "supportedTypes": [
         "movie",
         "tv"
       ],
-      "filename": "providers/4khdhub.js",
+      "filename": "providers/flimpalast.js",
       "enabled": true,
       "formats": ["mkv"],
-      "logo": "https://4khdhub.fans/favicon.ico",
+      "logo": "",
+      "contentLanguage": [
+        "de"
+      ]
+    },
+    {
+      "id": "serienstream",
+      "name": "Serienstream",
+      "description": "Most Series",
+      "version": "1.0.0",
+      "author": "Michaz",
+      "supportedTypes": [
+        "tv"
+      ],
+      "filename": "providers/serienstream.js",
+      "enabled": true,
+      "formats": ["mkv"],
+      "logo": "https://cdn2.iconfinder.com/data/icons/metro-ui-icon-set/128/Windows_Media_Player_alt.png",
+      "contentLanguage": [
+        "de",
+        "en"
+      ]
+    },
+    {
+      "id": "aniworld",
+      "name": "Aniworld",
+      "description": "Anime Series",
+      "version": "1.0.0",
+      "author": "Nuvio Team",
+      "supportedTypes": [
+        "tv"
+      ],
+      "filename": "providers/aniworld.js",
+      "enabled": true,
+      "formats": ["mkv"],
+      "logo": "",
+      "contentLanguage": [
+        "de",
+        "en",
+        "jp"
+      ]
+    },
+    {
+      "id": "mofilix-stream",
+      "name": "Moflix",
+      "description": "Most Popular Movies & Series",
+      "version": "1.0.0",
+      "author": "Michaz",
+      "supportedTypes": [
+        "movie",
+        "tv"
+      ],
+      "filename": "providers/mofilix-stream.js",
+      "enabled": true,
+      "logo": "",
+      "contentLanguage": [
+        "de"
+      ]
+    },
+    {
+      "id": "megakino",
+      "name": "Megakino",
+      "description": "Cinema Seres & Blockbuster",
+      "version": "1.0.0",
+      "author": "Michaz",
+      "supportedTypes": [
+        "movie",
+        "tv"
+      ],
+      "filename": "providers/megakino.js",
+      "enabled": true,
+      "formats": ["mkv"],
+      "logo": "",
+      "contentLanguage": [
+        "de"
+      ]
+    },
+    {
+      "id": "einschalten",
+      "name": "Einschalten",
+      "description": "Top Movies",
+      "version": "1.0.0",
+      "author": "Michaz",
+      "supportedTypes": [
+        "movie"
+      ],
+      "filename": "providers/einschalten.js",
+      "enabled": true,
+      "logo": "",
+      "contentLanguage": [
+        "de"
+      ]
+    },
+    {
+      "id": "hdflime",
+      "name": "HDFilme",
+      "description": "HD Movies & Series",
+      "version": "1.0.0",
+      "author": "Michaz",
+      "supportedTypes": [
+        "movie",
+        "tv"
+      ],
+      "filename": "providers/hdflime.js",
+      "enabled": true,
+      "logo": "https://hdfilme.to/templates/hdfilme/images/logo-hdfilme.svg",
       "contentLanguage": [
         "en"
       ]
     },
     {
-      "id": "uhdmovies",
-      "name": "UHDMovies",
-      "description": "UHD Movies streaming with multiple resolution options",
-      "version": "1.0.1",
-      "author": "Nuvio Team",
+      "id": "topstreamfilm",
+      "name": "Topstreamfilm",
+      "description": "Blockbuster & Streambuster",
+      "version": "1.0.0",
+      "author": "Michaz",
       "supportedTypes": [
         "movie",
         "tv"
       ],
-      "filename": "providers/uhdmovies.js",
+      "filename": "providers/topstreamfilm.js",
+      "enabled": true,
+      "logo": "https://net2025.cc/favicon.ico",
+      "contentLanguage": [
+        "de"
+      ],
+    },
+    {
+      "id": "mediathekview",
+      "name": "MediathekView",
+      "description": "All in one Mediathek",
+      "version": "1.0.0",
+      "author": "Michaz",
+      "supportedTypes": [
+        "movie",
+        "tv"
+      ],
+      "filename": "providers/vidsrc.js",
+      "enabled": true,
+      "logo": "",
+      "contentLanguage": [
+        "de"
+      ]
+    },
+    {
+      "id": "netzkino",
+      "name": "Netzkino",
+      "description": "Trashbuster",
+      "version": "1.0.0",
+      "author": "Michaz",
+      "supportedTypes": [
+        "movie",
+      ],
+      "filename": "providers/netzkino.js",
       "enabled": true,
       "formats": ["mkv"],
+      "logo": "/Assets/streamflix-1.png",
+      "contentLanguage": [
+        "de"
+      ]
+    }
+  ]
+    }      "formats": ["mkv"],
       "logo": "https://uhdmovies.cat/wp-content/uploads/2021/03/cropped-output-onlinepngtools-1-32x32.png",
       "contentLanguage": [
         "en"

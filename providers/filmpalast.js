@@ -1,45 +1,84 @@
 // filmpalast.js
-const cheerio = require('cheerio');
-const { fetchHtml } = require('./utils');
+const puppeteer = require('puppeteer');
 
-const SITE = 'https://filmpalast.to'; // adjust if different domain
+const SITE = 'https://filmpalast.to'; // ggf. anpassen
+
+async function withPage(fn) {
+  const browser = await puppeteer.launch({ headless: true });
+  const page = await browser.newPage();
+  await page.setUserAgent(
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
+    'AppleWebKit/537.36 (KHTML, like Gecko) ' +
+    'Chrome/109.0.0.0 Safari/537.36'
+  );
+  try {
+    return await fn(page);
+  } finally {
+    await browser.close();
+  }
+}
 
 async function list(path = '/') {
-  const url = new URL(path, SITE).href;
-  const html = await fetchHtml(url);
-  const $ = cheerio.load(html);
+  return withPage(async (page) => {
+    const url = new URL(path, SITE).href;
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
 
-  const items = [];
-  $('.movie-list .movie, .listing .item, .ml-item, article.post').each((i, el) => {
-    const el$ = $(el);
-    const title = el$.find('.title, h3, a, .ml-title').first().text().trim();
-    const href = el$.find('a').attr('href');
-    const poster = el$.find('img').attr('src') || el$.find('img').attr('data-src');
-    const url = href ? new URL(href, SITE).href : null;
-    if (title && url) items.push({ title, url, poster });
+    const items = await page.$$eval(
+      '.movie-list .movie, .listing .item, .ml-item, article.post',
+      (els) => els.map((el) => {
+        const a = el.querySelector('a');
+        const img = el.querySelector('img');
+        const titleEl = el.querySelector('.title, h3, a, .ml-title');
+        return {
+          title: titleEl ? titleEl.textContent.trim() : null,
+          url: a ? a.href : null,
+          poster: img?.getAttribute('src') ||
+                  img?.getAttribute('data-src') ||
+                  img?.getAttribute('data-srcset') || null,
+        };
+      }).filter(i => i.title && i.url)
+    );
+
+    return items;
   });
-
-  return items;
 }
 
 async function details(pageUrl) {
-  const html = await fetchHtml(pageUrl);
-  const $ = cheerio.load(html);
+  return withPage(async (page) => {
+    await page.goto(pageUrl, { waitUntil: 'domcontentloaded' });
 
-  const title = $('h1, .title, .entry-title').first().text().trim();
-  const description = $('.description, .content, #beschreibung, .entry-content').text().trim();
-  const poster = $('meta[property="og:image"]').attr('content') || $('img.poster').attr('src');
-  const year = $('.year, .meta .year').first().text().trim();
-  const cast = [];
-  $('.cast li, .actors a').each((i, el) => cast.push($(el).text().trim()));
+    const title = await page.$eval(
+      'h1, .title, .entry-title',
+      (el) => el.textContent.trim()
+    ).catch(() => null);
 
-  const links = [];
-  $('a[href*="embed"], a[href*="stream"], .mirror a, .links a, a[href*="player"]').each((i, el) => {
-    const href = $(el).attr('href');
-    if (href) links.push(new URL(href, pageUrl).href);
+    const description = await page.$eval(
+      '.description, .content, #beschreibung, .entry-content',
+      (el) => el.textContent.trim()
+    ).catch(() => null);
+
+    const poster = await page.$eval(
+      'meta[property="og:image"], img.poster',
+      (el) => el.getAttribute('content') || el.getAttribute('src')
+    ).catch(() => null);
+
+    const year = await page.$eval(
+      '.year, .meta .year',
+      (el) => el.textContent.trim()
+    ).catch(() => null);
+
+    const cast = await page.$$eval(
+      '.cast li, .actors a',
+      (els) => els.map((e) => e.textContent.trim())
+    ).catch(() => []);
+
+    const links = await page.$$eval(
+      'a[href*="embed"], a[href*="stream"], .mirror a, .links a, a[href*="player"]',
+      (els) => els.map((a) => a.href)
+    );
+
+    return { title, description, poster, year, cast, links };
   });
-
-  return { title, description, poster, year, cast, links };
 }
 
 async function streams(pageUrl) {
@@ -47,22 +86,31 @@ async function streams(pageUrl) {
   const found = [];
 
   for (const l of det.links) {
-    try {
-      const html = await fetchHtml(l);
-      const $ = cheerio.load(html);
+    await withPage(async (page) => {
+      try {
+        await page.goto(l, { waitUntil: 'domcontentloaded' });
 
-      const iframe = $('iframe').attr('src');
-      if (iframe) found.push(new URL(iframe, l).href);
+        // Iframe-Quelle
+        const iframe = await page.$eval('iframe', (el) => el.src).catch(() => null);
+        if (iframe) found.push(iframe);
 
-      $('video source').each((i, s) => {
-        const src = $(s).attr('src');
-        if (src) found.push(new URL(src, l).href);
-      });
+        // Video sources
+        const videos = await page.$$eval('video source', (els) =>
+          els.map((s) => s.getAttribute('src')).filter(Boolean)
+        );
+        found.push(...videos);
 
-      const re = /(?:"|')((https?:\/\/)[^"']+\.(mp4|m3u8|mkv))(?:"|')/g;
-      let m;
-      while ((m = re.exec(html)) !== null) found.push(m[1]);
-    } catch (e) { /* ignore embed failures */ }
+        // Suche nach mp4/m3u8/mkv im HTML
+        const html = await page.content();
+        const re = /(?:"|')((https?:\/\/)[^"']+\.(mp4|m3u8|mkv))(?:"|')/g;
+        let m;
+        while ((m = re.exec(html)) !== null) {
+          found.push(m[1]);
+        }
+      } catch (e) {
+        // still ok
+      }
+    });
   }
 
   return Array.from(new Set(found));
